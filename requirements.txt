@@ -1,0 +1,7 @@
+altair==4.2.0
+numpy==1.24.3
+pandas==1.4.3
+streamlit==1.32.2
+streamlit_echarts==0.4.0
+yfinance==0.1.74
+streamlit-aggrid==0.3.4.post3
