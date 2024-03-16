@@ -294,7 +294,7 @@ def export_metrics_to_excel(data_frame, combinations, risk_free_rate, confidence
     # After concatenating, reset the index to turn the strategy names into a column. 
     # This step will name the index column automatically.
     all_metrics_df.reset_index(inplace=True)
-    all_metrics_df.rename(columns={'index': 'Strategy Name'}, inplace=True)
+    all_metrics_df.rename(columns={'index': 'Portfolio Split'}, inplace=True)
 
     all_metrics_df.to_excel(file_path, index=False)
     print(f"Metrics for all combinations have been saved to {file_path}.")
@@ -323,15 +323,30 @@ df['Composite Score'] = df[normalized_columns].mean(axis=1)
 
 # Find the best strategy based on the highest composite score
 # Assuming 'Strategy Name' is the column with the actual names of the strategies
-composite_scores_df = df[['Strategy Name', 'Composite Score']].sort_values(by='Composite Score', ascending=False)
+composite_scores_df = df[['Portfolio Split', 'Composite Score']].sort_values(by='Composite Score', ascending=False)
 
 # For displaying the best strategy
 best_strategy_row = composite_scores_df.iloc[0]  # Get the first row of the sorted DataFrame
-best_strategy_name = best_strategy_row['Strategy Name']  # Assuming the names are stored in 'Strategy Name'
+best_strategy_name = best_strategy_row['Portfolio Split']  # Assuming the names are stored in 'Strategy Name'
 
 # Now use AgGrid with the DataFrame
-st.write('Composite Scores for each strategy:')
+st.write('Composite Scores for each Portfolio Split:')
 AgGrid(composite_scores_df)
 
+# Top 5
+top_five_strategies = composite_scores_df.head(5)
+
+# Create a bar chart
+chart = alt.Chart(top_five_strategies, height=400).mark_bar().encode(
+    x=alt.X('Portfolio Split', sort='-y', axis=alt.Axis(labelAngle=-45)), 
+    y='Composite Score',
+    color='Portfolio Split'  
+).properties(
+    title='Top 5 Portfolio Splits by Composite Score'
+)
+
+# Display the chart
+st.altair_chart(chart, use_container_width=True)
+
 st.write('Summary')
-st.info(f"\nThe recommended strategy is: {best_strategy_name}")
+st.info(f"\nThe recommended Portfolio Split is: {best_strategy_name}")
