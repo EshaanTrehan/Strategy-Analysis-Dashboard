@@ -5,6 +5,7 @@ from streamlit_echarts import st_echarts
 import altair as alt
 import yfinance as yf
 from st_aggrid import AgGrid
+from scipy.stats import gmean
 
 # Colour decleartion
 colors = ['#1f77b4', '#ff7f0e']
@@ -63,7 +64,7 @@ def plot_daily_returns_echarts(data_frame):
 def calculate_metrics(sheet1_df, risk_free_rate, confidence_level):
 
     series1_metrics = {
-        'Mean Return': sheet1_df['RoR Series 1'].mean(),
+        'Geometric Mean Return': gmean(sheet1_df['RoR Series 1'] + 1) - 1,
         'Standard Deviation': sheet1_df['RoR Series 1'].std(),
         'Sharpe Ratio': (sheet1_df['RoR Series 1'].mean() - risk_free_rate) / sheet1_df['RoR Series 1'].std(),
         'Cumulative Returns': (1 + sheet1_df['RoR Series 1']).cumprod().iloc[-1] - 1,
@@ -75,7 +76,7 @@ def calculate_metrics(sheet1_df, risk_free_rate, confidence_level):
         'CVaR': var_cvar(sheet1_df['RoR Series 1'], confidence_level)[1]
     }
     series2_metrics = {
-        'Mean Return': sheet1_df['RoR Series 2'].mean(),
+        'Geometric Mean Return': gmean(sheet1_df['RoR Series 2'] + 1) - 1,
         'Standard Deviation': sheet1_df['RoR Series 2'].std(),
         'Sharpe Ratio': (sheet1_df['RoR Series 2'].mean() - risk_free_rate) / sheet1_df['RoR Series 2'].std(),
         'Cumulative Returns': (1 + sheet1_df['RoR Series 2']).cumprod().iloc[-1] - 1,
@@ -222,7 +223,7 @@ st.table(risk_profile_table)
 # Define a simple logic to determine which strategy is better for each metric
 # Here, higher is better for returns, and lower is better for risk metrics
 def get_strategy_preference(series1_val, series2_val, metric_name):
-    if metric_name in ['Mean Return', 'Sharpe Ratio', 'Cumulative Returns', 'Annualized Return', 'Sortino Ratio']:
+    if metric_name in ['Geometric Mean Return', 'Sharpe Ratio', 'Cumulative Returns', 'Annualized Return', 'Sortino Ratio']:
         return 'Series 1' if series1_val > series2_val else 'Series 2'
     else:
         return 'Series 1' if series1_val < series2_val else 'Series 2'

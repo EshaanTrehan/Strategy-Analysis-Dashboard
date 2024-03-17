@@ -6,6 +6,7 @@ import altair as alt
 import yfinance as yf
 from st_aggrid import AgGrid
 from itertools import permutations
+from scipy.stats import gmean
 
 # Colour decleartion
 colors = ['#1f77b4', '#ff7f0e']
@@ -49,7 +50,7 @@ def var_cvar(return_series, confidence_level):
 def calculate_metrics(filtered_df, risk_free_rate, confidence_level, selected_combination):
 
     calculated_metrics = {
-        'Mean Return': filtered_df[selected_combination].mean(),
+        'Geometric Mean Return': gmean(filtered_df[selected_combination] + 1) - 1,
         'Standard Deviation': filtered_df[selected_combination].std(),
         'Sharpe Ratio': (filtered_df[selected_combination].mean() - risk_free_rate) / filtered_df[selected_combination].std(),
         'Cumulative Returns': (1 + filtered_df[selected_combination]).cumprod().iloc[-1] - 1,
@@ -308,7 +309,7 @@ df = pd.read_excel(file_path)
 # Normalize metrics
 # For metrics where higher is better, normalize directly
 # For metrics where lower is better, invert the normalization
-metrics_to_normalize_directly = ['Mean Return', 'Sharpe Ratio', 'Cumulative Returns', 'Annualized Return', 'Sortino Ratio']
+metrics_to_normalize_directly = ['Geometric Mean Return', 'Sharpe Ratio', 'Cumulative Returns', 'Annualized Return', 'Sortino Ratio']
 metrics_to_normalize_inversely = ['Standard Deviation', 'Annualized Volatility', 'Maximum Drawdown', 'VaR', 'CVaR']
 
 for metric in metrics_to_normalize_directly:
