@@ -16,9 +16,9 @@ colors = ['#1f77b4', '#ff7f0e']
 def get_t_bill_rates():
     # Tickers for Treasury Bills on Yahoo Finance
     tickers = {
-        '5 Year US Treasury Note yeild': '^FVX',            # 5 year treasury note Yeild
-        '10 Year US Treasury Note Intreast rate': '^TNX',   # 10 year note Intreast rate
-        '30 Year uS Treasury Bond yield': '^TYX'            # 30 year treasury bond yield
+        # '5 Year US Treasury Note yeild': '^FVX',            # 5 year treasury note Yeild
+        # '10 Year US Treasury Note Intreast rate': '^TNX',   # 10 year note Intreast rate
+        # '30 Year uS Treasury Bond yield': '^TYX'            # 30 year treasury bond yield
     }
     rates = {'Duration Type': [], 'Rate': []}
     
