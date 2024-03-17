@@ -117,6 +117,11 @@ def plot_metric_altair(metric_name, metric_value):
 
     st.altair_chart(chart, use_container_width=True)
 
+def decimal_to_percentage_display(value):
+    return f"{value:.2f}%"
+
+def decimal_to_percentage_graph(value):
+    return value * 100
 
 # Streamlit App
 st.title('Abbey Capital Graduate Program Task Part 2')
@@ -210,12 +215,27 @@ calculated_metrics = calculate_metrics(filtered_df, risk_free_rate, confidence_l
 plot_daily_returns_echarts(filtered_df, selected_combination)
 
 # Display metrics and graphs
-for metric_name, metric_value in calculated_metrics.items():
-    plot_metric_altair(metric_name, metric_value)
+metrics_to_display_as_percentage = [
+    'Geometric Mean Return', 'Cumulative Returns', 'Annualized Return', 'Annualized Volatility', 'Maximum Drawdown', 'VaR', 'CVaR'
+]
 
-    # Display the metric value as a number
-    col1 = st.columns([1])[0]  # Create a single column
-    col1.metric(label=f"{metric_name}", value=f"{metric_value:.4f}" if isinstance(metric_value, float) else f"{metric_value}")
+for metric_name, metric_value in calculated_metrics.items():
+    metric_value = calculated_metrics[metric_name]
+
+    if metric_name in metrics_to_display_as_percentage:
+        metric_value = decimal_to_percentage_graph(metric_value)
+    else:
+        metric_value = f"{metric_value:.4f}" if isinstance(metric_value, float) else metric_value
+
+    plot_metric_altair(metric_name, metric_value)
+    
+    if metric_name in metrics_to_display_as_percentage:
+        display_value = decimal_to_percentage_display(metric_value)
+    else:
+        display_value = f"{metric_value:.4f}" if isinstance(metric_value, float) else f"{metric_value}"
+
+    col1 = st.columns([1])[0] 
+    col1.metric(label=f"{metric_name}", value=display_value)
 
 # Display User parameters
 user_params = pd.DataFrame({
@@ -225,8 +245,16 @@ user_params = pd.DataFrame({
 st.write('User Selected Parameters')
 st.table(user_params)
 
-# Create a DataFrame from the metrics dictionary
-all_metrics = pd.DataFrame(list(calculated_metrics.items()), columns=['Metric', selected_combination])
+# Table for metrics
+formatted_metrics = {}
+for metric_name, metric_value in calculated_metrics.items():
+    if metric_name in metrics_to_display_as_percentage:
+        formatted_value = decimal_to_percentage_display(metric_value)
+    else:
+        formatted_value = f"{metric_value:.4f}" if isinstance(metric_value, float) else metric_value
+    formatted_metrics[metric_name] = formatted_value
+
+all_metrics = pd.DataFrame(list(formatted_metrics.items()), columns=['Metric', 'Value'])
 st.write('Metrics Comparison')
 AgGrid(all_metrics)
 

@@ -109,6 +109,12 @@ def plot_metric_altair(metric_name, series1_value, series2_value):
     
     st.altair_chart(chart, use_container_width=True)
 
+def decimal_to_percentage_display(value):
+    return f"{value:.2f}%"
+
+def decimal_to_percentage_graph(value):
+    return value * 100
+
 # Streamlit App
 st.title('Abbey Capital Graduate Program Task Part 1')
 
@@ -143,12 +149,33 @@ series1_metrics, series2_metrics = calculate_metrics(filtered_df, risk_free_rate
 plot_daily_returns_echarts(filtered_df)
 
 # Display metrics and graphs
+metrics_to_display_as_percentage = [
+    'Geometric Mean Return', 'Cumulative Returns', 'Annualized Return', 'Annualized Volatility', 'Maximum Drawdown', 'VaR', 'CVaR'
+]
+
 for metric_name in series1_metrics.keys():
-    plot_metric_altair(metric_name, series1_metrics[metric_name], series2_metrics[metric_name])
+    series1_value = series1_metrics[metric_name]
+    series2_value = series2_metrics[metric_name]
+
+    # Check if this metric should be displayed as a percentage
+    if metric_name in metrics_to_display_as_percentage:
+        series1_value = decimal_to_percentage_graph(series1_value)
+        series2_value = decimal_to_percentage_graph(series2_value)
+    else:
+        # Format as a decimal with four places if it's not a percentage
+        series1_value = f"{series1_value:.4f}" if isinstance(series1_value, float) else series1_value
+        series2_value = f"{series2_value:.4f}" if isinstance(series2_value, float) else series2_value
+
+    plot_metric_altair(metric_name, series1_value, series2_value)
+
+    if metric_name in metrics_to_display_as_percentage:
+        series1_value = decimal_to_percentage_display(series1_value)
+        series2_value = decimal_to_percentage_display(series2_value)
 
     col1, col2 = st.columns(2)
-    col1.metric(label=f"Series 1 {metric_name}", value=f"{series1_metrics[metric_name]:.4f}" if isinstance(series1_metrics[metric_name], float) else f"{series1_metrics[metric_name]}")
-    col2.metric(label=f"Series 2 {metric_name}", value=f"{series2_metrics[metric_name]:.4f}" if isinstance(series2_metrics[metric_name], float) else f"{series2_metrics[metric_name]}")
+    col1.metric(label=f"Series 1 {metric_name}", value=series1_value)
+    col2.metric(label=f"Series 2 {metric_name}", value=series2_value)
+
 
 # Display User parameters
 user_params = pd.DataFrame({
@@ -159,11 +186,31 @@ st.write('User Selected Parameters')
 st.table(user_params)
 
 
-# Combine all metrics into a DataFrame for Series 1 and Series 2
+# Table Displaying all metrics
+formatted_metrics = []
+series1_values = []
+series2_values = []
+
+# Loop through the metrics, formatting as needed
+for metric_name in series1_metrics.keys():
+    formatted_metrics.append(metric_name)  
+
+    if metric_name in metrics_to_display_as_percentage:
+        series1_value = decimal_to_percentage_display(series1_metrics[metric_name] * 100)  
+    else:
+        series1_value = f"{series1_metrics[metric_name]:.4f}" if isinstance(series1_metrics[metric_name], float) else series1_metrics[metric_name]
+    series1_values.append(series1_value)
+    
+    if metric_name in metrics_to_display_as_percentage:
+        series2_value = decimal_to_percentage_display(series2_metrics[metric_name] * 100) 
+    else:
+        series2_value = f"{series2_metrics[metric_name]:.4f}" if isinstance(series2_metrics[metric_name], float) else series2_metrics[metric_name]
+    series2_values.append(series2_value)
+
 all_metrics = pd.DataFrame({
-    'Metric': series1_metrics.keys(),
-    'Series 1 Value': series1_metrics.values(),
-    'Series 2 Value': series2_metrics.values()
+    'Metric': formatted_metrics,
+    'Series 1 Value': series1_values,
+    'Series 2 Value': series2_values
 })
 st.write('Metrics Comparison')
 AgGrid(all_metrics)
