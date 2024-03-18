@@ -147,7 +147,7 @@ plot_daily_returns_echarts(filtered_df)
 
 # Display metrics and graphs
 metrics_to_display_as_percentage = [
-    'Geometric Mean Return', 'Cumulative Returns', 'Annualized Return', 'Annualized Volatility', 'Maximum Drawdown', 'VaR', 'CVaR'
+    'Geometric Mean Return', 'Standard Deviation', 'Cumulative Returns', 'Annualized Return', 'Annualized Volatility', 'Maximum Drawdown', 'VaR', 'CVaR'
 ]
 
 for metric_name in series1_metrics.keys():
