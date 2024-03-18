@@ -246,17 +246,15 @@ st.write('User Selected Parameters')
 st.table(user_params)
 
 # Table for metrics
-formatted_metrics = {}
+metrics_df = pd.DataFrame(columns=['Metric', 'Value'])
 for metric_name, metric_value in calculated_metrics.items():
     if metric_name in metrics_to_display_as_percentage:
-        formatted_value = decimal_to_percentage_display(metric_value)
+        display_value = decimal_to_percentage_display(decimal_to_percentage_graph(metric_value))
     else:
-        formatted_value = f"{metric_value:.4f}" if isinstance(metric_value, float) else metric_value
-    formatted_metrics[metric_name] = formatted_value
-
-all_metrics = pd.DataFrame(list(formatted_metrics.items()), columns=['Metric', 'Value'])
+        display_value = f"{metric_value:.4f}" if isinstance(metric_value, float) else metric_value
+    metrics_df = metrics_df.append({'Metric': metric_name, 'Value': display_value}, ignore_index=True)
 st.write('Metrics Comparison')
-AgGrid(all_metrics)
+AgGrid(metrics_df)
 
 
 # Risk Range Explanation Table
