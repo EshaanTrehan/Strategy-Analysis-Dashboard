@@ -37,10 +37,10 @@ def max_drawdown(return_series):
     drawdown = (cumulative_returns - peak) / peak
     return drawdown.min()
 
-def sortino_ratio(return_series):
+def sortino_ratio(return_series, risk_free_rate):
     mean_return = return_series.mean()
     negative_volatility = return_series[return_series < 0].std()
-    return mean_return / negative_volatility
+    return (mean_return - risk_free_rate) / negative_volatility
 
 def var_cvar(return_series, confidence_level):
     var = return_series.quantile(1 - confidence_level)
@@ -57,7 +57,7 @@ def calculate_metrics(filtered_df, risk_free_rate, confidence_level, selected_co
         'Annualized Return': np.power(gmean(filtered_df[selected_combination] + 1), 252) - 1,
         'Annualized Volatility': filtered_df[selected_combination].std() * np.sqrt(252),
         'Maximum Drawdown': max_drawdown(filtered_df[selected_combination]),
-        'Sortino Ratio': sortino_ratio(filtered_df[selected_combination]),
+        'Sortino Ratio': sortino_ratio(filtered_df[selected_combination], risk_free_rate),
         'VaR': var_cvar(filtered_df[selected_combination], confidence_level)[0],
         'CVaR': var_cvar(filtered_df[selected_combination], confidence_level)[1]
     }
