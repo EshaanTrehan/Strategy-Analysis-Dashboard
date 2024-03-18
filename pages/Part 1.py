@@ -13,7 +13,7 @@ colors = ['#1f77b4', '#ff7f0e']
 # Function Definitions for Analysis
 
 def get_t_bill_rates():
-    # Tickers for Treasury Bills on Yahoo Finance
+    # Tickers for Treasury Bills from Yahoo Finance
     tickers = {
         # '5 Year US Treasury Note yeild': '^FVX',            # 5 year treasury note Yeild
         # '10 Year US Treasury Note Intreast rate': '^TNX',   # 10 year note Intreast rate
@@ -47,7 +47,6 @@ def var_cvar(return_series, confidence_level):
     return var, cvar
 
 def plot_daily_returns_echarts(data_frame):
-    # Prepare the data for ECharts
     options = {
         "tooltip": {"trigger": 'axis'},
         "legend": {"data": ['Series 1', 'Series 2']},
@@ -91,13 +90,11 @@ def calculate_metrics(sheet1_df, risk_free_rate, confidence_level):
     return series1_metrics, series2_metrics
 
 def plot_metric_altair(metric_name, series1_value, series2_value):
-    # Prepare data for Altair
     source = pd.DataFrame({
         'Series': ['Series 1', 'Series 2'],
         metric_name: [series1_value, series2_value]
     })
 
-    # Altair Bar Chart
     chart = alt.Chart(source).mark_bar().encode(
         x='Series:N',
         y=f'{metric_name}:Q',
@@ -134,7 +131,7 @@ filtered_df = sheet1_df[(sheet1_df['Date'] >= start_date) & (sheet1_df['Date'] <
 # Slider for confidence level
 confidence_level = st.slider('Select the Confidence Level for VaR and CVaR', 0.01, 0.99, 0.95)
 
-# Slider for risk-free rate (as a percentage, e.g., 2 for 2%)
+# Slider for risk-free rate 
 risk_free_rate = st.slider('Select the Risk-Free Rate (%)', 0.0, 10.0, 4.44) / 100
 
 # Cureent T-Bill rates to help identify risk free rate
@@ -142,7 +139,7 @@ st.write('Current T-Bill Rates')
 t_bill_rates_df = get_t_bill_rates()
 st.table(t_bill_rates_df)
 
-# Recalculate metrics with user input
+# Calculate metrics with user input
 series1_metrics, series2_metrics = calculate_metrics(filtered_df, risk_free_rate, confidence_level)
 
 # Plotting Daily Returns
@@ -227,7 +224,6 @@ st.write('Risk Range Definitions')
 st.table(risk_range_table)
 
 # Risk/Volatility Profile Table
-# Define thresholds for low, moderate, and high risk/volatility (these are placeholders)
 def risk_profile(metric, value, var):
     if metric == 'Annualized Volatility':
         if value < 0.05:  # Less than 5%
@@ -248,7 +244,7 @@ def risk_profile(metric, value, var):
             return 'Low'
         elif value >= 2 * var:
             return 'Moderate'
-        else:  # Significantly more than double the VaR value
+        else:  
             return 'High'
     elif metric == 'Maximum Drawdown':
         if value > -0.10:  # Less than 10% drawdown
@@ -267,8 +263,7 @@ risk_profile_table = pd.DataFrame({
 st.write('Risk/Volatility Profile')
 st.table(risk_profile_table)
 
-# Define a simple logic to determine which strategy is better for each metric
-# Here, higher is better for returns, and lower is better for risk metrics
+# Basic Strategy
 def get_strategy_preference(series1_val, series2_val, metric_name):
     if metric_name in ['Geometric Mean Return', 'Sharpe Ratio', 'Cumulative Returns', 'Annualized Return', 'Sortino Ratio']:
         return 'Series 1' if series1_val > series2_val else 'Series 2'
