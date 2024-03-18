@@ -54,7 +54,7 @@ def calculate_metrics(filtered_df, risk_free_rate, confidence_level, selected_co
         'Standard Deviation': filtered_df[selected_combination].std(),
         'Sharpe Ratio': (filtered_df[selected_combination].mean() - risk_free_rate) / filtered_df[selected_combination].std(),
         'Cumulative Returns': (1 + filtered_df[selected_combination]).cumprod().iloc[-1] - 1,
-        'Annualized Return': np.power((1 + filtered_df[selected_combination].mean()), 252) - 1,
+        'Annualized Return': np.power(gmean(filtered_df[selected_combination] + 1), 252) - 1,
         'Annualized Volatility': filtered_df[selected_combination].std() * np.sqrt(252),
         'Maximum Drawdown': max_drawdown(filtered_df[selected_combination]),
         'Sortino Ratio': sortino_ratio(filtered_df[selected_combination]),
