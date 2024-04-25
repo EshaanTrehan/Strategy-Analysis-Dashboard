@@ -124,10 +124,10 @@ def decimal_to_percentage_graph(value):
     return value * 100
 
 # Streamlit App
-st.title('Abbey Capital Graduate Program Task Part 2')
+st.title('Task 2')
 
 # Load data and pre-process
-data_path = 'Graduate Programme 2024 - Exercise Data.xlsx'
+data_path = 'Data.xlsx'
 
 # Renaming first col in Sheet 2 to Date
 sheet2_df = pd.read_excel(data_path, sheet_name='Sheet2', index_col=0)
